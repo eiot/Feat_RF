@@ -3,12 +3,26 @@ function SegResult = petseg_main(input_dir,load_dir,output_dir)
 % INPUT:   input_dir   load the PET images to be segmented
 %          load_dir    load the mat files
 % OUTPUT:  segedmat	 
-
+%
+% The files in input_dir are supposed to be the same directory with  PETSEG - Training data, such as:
+% input_dir
+% ├─Clinical
+% │  ├─clinical_1
+% │  ├─clinical_2
+% │  └─clinical_3
+% ├─Phantom
+% │  ├─phantom_1
+% │  ├─phantom_2
+% │  └─phantom_3
+% └─Simu
+%    ├─Simu_1
+%    └─Simu_2
+%
 % examples(Window):
 % input_dir='D:\data\PET_liu\send\data\test_input\';
 % load_dir='D:\data\PET_liu\send\data\trained_model\';
 % output_dir='D:\data\PET_liu\send\data\output\';
-
+%
 % examples(Linux):
 % input_dir='/mysoft/PET_liu/Feat_RF-master/data/test_input/';
 % load_dir='/mysoft/PET_liu/Feat_RF-master/data/trained_model/';
