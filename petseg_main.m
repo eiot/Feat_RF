@@ -19,9 +19,9 @@ function SegResult = petseg_main(input_dir,load_dir,output_dir)
 %    └─Simu_2
 %
 % examples(Window):
-% input_dir='D:\data\PET_liu\send\data\test_input\';
-% load_dir='D:\data\PET_liu\send\data\trained_model\';
-% output_dir='D:\data\PET_liu\send\data\output\';
+% input_dir='D:\data\PET_liu\send_new\Feat_RF\data\test_input\';
+% load_dir='D:\data\PET_liu\send_new\Feat_RF\data\trained_model\';
+% output_dir='D:\data\PET_liu\send_new\Feat_RF\data\output\';
 %
 % examples(Linux):
 % input_dir='/mysoft/PET_liu/Feat_RF-master/data/test_input/';
@@ -38,7 +38,7 @@ addpath(genpath(dirname));  % Add all subdirectory
 cd(dirname);
 
 cd(input_dir); 
-all_list=[dir('C*');dir('P*');dir('S*');dir('c*');dir('p*');dir('s*')];
+all_list=[dir('c*');dir('p*');dir('s*')];
 
 for i=1:size(all_list,1)
 
