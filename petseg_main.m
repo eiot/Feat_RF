@@ -35,10 +35,14 @@ else
 end
 dirname = fileparts(mfilename('fullpath')); % Current directory
 addpath(genpath(dirname));  % Add all subdirectory
-cd(dirname);
 
 cd(input_dir); 
-all_list=[dir('c*');dir('p*');dir('s*')];
+
+if strcmpi(computer,'PCWIN') |strcmpi(computer,'PCWIN64')
+   all_list=[dir('c*');dir('p*');dir('s*')];
+else
+   all_list=[dir('C*');dir('P*');dir('S*');dir('c*');dir('p*');dir('s*')];
+end
 
 for i=1:size(all_list,1)
 
@@ -48,7 +52,7 @@ for i=1:size(all_list,1)
     for j=1:size(type_list,1)
         pat_folder=type_list(j).name;
         cd([input_dir file_type file_slash pat_folder file_slash]);
-        nii_list=dir('*.nii');
+        nii_list=[dir(['*PET*.nii']);dir(['*TEP*.nii'])];
         for k=1:size(nii_list,1)
             original_file=[input_dir file_type file_slash pat_folder file_slash nii_list(k).name];
             TestImg=load_nii(original_file);
