@@ -1,4 +1,4 @@
-function SegResult = petseg_main(input_dir,load_dir,output_dir)
+function petseg_main(input_dir,load_dir,output_dir)
 % The main function of PetSeg
 % INPUT:   input_dir   load the PET images to be segmented
 %          load_dir    load the mat files
