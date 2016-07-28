@@ -35,7 +35,12 @@ end
 if ( strncmpi(input_file,'phantom',7) == 1 )
   file_type = 'Phantom';
 end
-file_type
+
+if (strcmp(file_type,'Unknown'))
+  error('Cannot determine file type')
+else
+  file_type
+end
 
 switch(file_type)
   case 'Clinical'
