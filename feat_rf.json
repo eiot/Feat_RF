@@ -1,0 +1,29 @@
+{
+  "name": "Feat_RF",
+  "tool-version": "1.0",
+  "description": "PETSEG pipeline submitted by Huang Xu",
+  "command-line": "HOME=/tmp; petseg_main [PET_IMAGE] /data/trained_model/ .",
+  "docker-image": "viplatform/miccai_challenge_2016_hust",
+  "docker-index": "http://index.docker.io",
+  "schema-version": "0.2",
+  "inputs": [
+    {
+      "id": "pet_image",
+      "name": "Image path",
+      "type": "File",
+      "description": "The input image path",
+      "command-line-key": "[PET_IMAGE]",
+      "list": false,
+      "optional": false,
+      "command-line-flag": "-i"
+    }
+  ],
+  "output-files": [
+    {
+            "id": "segmentation_result_challenge",
+            "name": "Segmented image",
+            "description": "The segmented image",
+            "path-template": "Result_[PET_IMAGE]"
+    }
+  ]
+} 

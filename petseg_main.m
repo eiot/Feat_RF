@@ -1,84 +1,60 @@
-function petseg_main(input_dir,load_dir,output_dir)
+function petseg_main(input_file,output_dir)
 % The main function of PetSeg
-% INPUT:   input_dir   load the PET images to be segmented
-%          load_dir    load the mat files
+% INPUT:   input_file  the PET image to be segmented
 % OUTPUT:  segedmat	 
 %
-% The files in input_dir are supposed to be the same directory with  PETSEG - Training data, such as:
-% input_dir
-% ├─Clinical
-% │  ├─clinical_1
-% │  ├─clinical_2
-% │  └─clinical_3
-% ├─Phantom
-% │  ├─phantom_1
-% │  ├─phantom_2
-% │  └─phantom_3
-% └─Simu
-%    ├─Simu_1
-%    └─Simu_2
+% input_file is supposed to be named according to the same convention as used in  PETSEG - Training data, such as:
+% clinical_1, clinical_2, phantom_1, phantom_2, Simu_1, Simu_2, etc
 %
 % examples(Window):
-% input_dir='D:\data\PET_liu\send_new\Feat_RF\data\test_input\';
-% load_dir='D:\data\PET_liu\send_new\Feat_RF\data\trained_model\';
-% output_dir='D:\data\PET_liu\send_new\Feat_RF\data\output\';
+% input_file='clinical_1.nii';
+% output_dir='D:\data\PET_liu\send_new\Feat_RF\output\';
 %
 % examples(Linux):
-% input_dir='/mysoft/PET_liu/Feat_RF-master/data/test_input/';
-% load_dir='/mysoft/PET_liu/Feat_RF-master/data/trained_model/';
-% output_dir='/mysoft/PET_liu/Feat_RF-master/data/output/';
+% input_file='clinical_2.nii';
+% output_dir='/mysoft/PET_liu/Feat_RF-master/output/';
 
 if strcmpi(computer,'PCWIN') |strcmpi(computer,'PCWIN64')
-   file_slash='\';
+  file_slash='\';
 else
-   file_slash='/';
+  file_slash='/';
 end
 dirname = fileparts(mfilename('fullpath')); % Current directory
 addpath(genpath(dirname));  % Add all subdirectory
 
-cd(input_dir); 
-
-if strcmpi(computer,'PCWIN') |strcmpi(computer,'PCWIN64')
-   all_list=[dir('c*');dir('p*');dir('s*')];
-else
-   all_list=[dir('C*');dir('P*');dir('S*');dir('c*');dir('p*');dir('s*')];
+TestImg=load_nii(input_file);
+%disp('Get the features of the test sample:');
+feat_gray=featextract(TestImg.img,'gray');
+file_type = 'Unknown';
+if ( strncmpi(input_file,'clinical',8) == 1 )
+  file_type = 'Clinical';
 end
+if ( strncmpi(input_file,'simu',4) == 1 )
+  file_type = 'Simu';
+end
+if ( strncmpi(input_file,'phantom',7) == 1 )
+  file_type = 'Phantom';
+end
+file_type
+switch(file_type)
+  case 'Clinical'
+    load('Model_Gray_Clin.mat');
+    X_tst=feat_gray;
+  case 'Phantom'
+    load('Model_Gray_Phantom.mat');
+    X_tst=feat_gray;  
+  case 'Simu'
+    load('Model_Gray_Simu.mat');
+    X_tst=feat_gray; 
+  otherwise
+    error('Cannot determine file type')
+end
+%disp('Classificating the voxels:');
+Y_hat=classRF_predict(X_tst,model);
+temp=TestImg;
+SegResult=GetSegResult(temp.img,Y_hat);
+temp.img=SegResult;
 
-for i=1:size(all_list,1)
-
-    file_type=all_list(i).name;
-    cd([input_dir file_type file_slash]);
-    type_list=dir(['*',file_type(2:end),'*']);
-    for j=1:size(type_list,1)
-        pat_folder=type_list(j).name;
-        cd([input_dir file_type file_slash pat_folder file_slash]);
-        nii_list=[dir(['*PET*.nii']);dir(['*TEP*.nii'])];
-        for k=1:size(nii_list,1)
-            original_file=[input_dir file_type file_slash pat_folder file_slash nii_list(k).name];
-            TestImg=load_nii(original_file);
-            %disp('Get the features of the test sample:');
-            feat_gray=featextract(TestImg.img,'gray');
-            switch(file_type)
-                case 'Clinical'
-                    load([load_dir 'Model_Gray_Clin.mat']);
-                    X_tst=feat_gray;
-                case 'Phantom'
-                    load([load_dir 'Model_Gray_Phantom.mat']);
-                    X_tst=feat_gray;  
-                case 'Simu'
-                    load([load_dir 'Model_Gray_Simu.mat']);
-                    X_tst=feat_gray; 
-            end
-            %disp('Classificating the voxels:');
-            Y_hat=classRF_predict(X_tst,model);
-            temp=TestImg;
-            SegResult=GetSegResult(temp.img,Y_hat);
-            temp.img=SegResult;
-            
-            seged_dir=[output_dir file_slash file_type file_slash pat_folder];
-            if ~(exist(seged_dir, 'dir') )        mkdir(seged_dir);  end
-            
-            save_nii(temp,[seged_dir file_slash 'Result_' nii_list(k).name(1:end-4) '.nii']);
-        end        
-    end
+if ~(exist(output_dir, 'dir') )        mkdir(output_dir);  end
+    save_nii(temp,[output_dir file_slash 'Result_' input_file(1:end-4) '.nii']);
 end
